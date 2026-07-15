@@ -3,10 +3,11 @@ import { useRsvp } from '../hooks/useRsvp';
 
 export default function RsvpCard() {
   const { guestName } = useGuest();
-  const { attending, saving, respond } = useRsvp(guestName);
+  const { attending, loading, saving, error, respond } = useRsvp(guestName);
 
   const baseBtn =
     'px-5 py-3 rounded-full font-bold text-sm cursor-pointer font-body transition-all duration-150 ease-out disabled:opacity-60 disabled:cursor-wait';
+  const disabled = saving || loading;
 
   return (
     <div className="w-full max-w-[480px] bg-cream-50 rounded-3xl px-7 py-7 mt-6 text-center shadow-[0_10px_34px_oklch(30%_0.02_20/0.1)] animate-[bs-pop_0.8s_ease-out_0.45s_both]">
@@ -17,7 +18,7 @@ export default function RsvpCard() {
       <div className="flex justify-center gap-3">
         <button
           type="button"
-          disabled={saving}
+          disabled={disabled}
           onClick={() => respond(true)}
           className={`${baseBtn} ${
             attending === true
@@ -29,7 +30,7 @@ export default function RsvpCard() {
         </button>
         <button
           type="button"
-          disabled={saving}
+          disabled={disabled}
           onClick={() => respond(false)}
           className={`${baseBtn} ${
             attending === false
@@ -47,6 +48,7 @@ export default function RsvpCard() {
             : 'Gracias por avisarnos, ¡te extrañaremos!'}
         </div>
       )}
+      {error && <div className="mt-4 text-sm text-rose-600">No pudimos guardar tu respuesta, intenta de nuevo.</div>}
     </div>
   );
 }

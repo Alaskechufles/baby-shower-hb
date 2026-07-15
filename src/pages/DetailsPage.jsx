@@ -9,6 +9,8 @@ import { useSceneTransition } from '../context/TransitionContext';
 import TabNav from '../components/TabNav';
 import EventCountdown from '../components/EventCountdown';
 import RsvpCard from '../components/RsvpCard';
+import SwitchGuestButton from '../components/SwitchGuestButton';
+import { EVENT_DATE_LABEL, EVENT_TIME_LABEL } from '../lib/eventInfo';
 
 export default function DetailsPage() {
   const { guestName } = useGuest();
@@ -49,6 +51,9 @@ export default function DetailsPage() {
       <div className="font-display italic text-[17px] text-plum-600 mb-1.5 animate-[bs-pop_0.7s_ease-out_0.1s_both]">
         ¡Hola, {guestName}!
       </div>
+      <div className="mb-4">
+        <SwitchGuestButton />
+      </div>
       <h1 className="font-display font-bold text-[clamp(30px,6vw,44px)] m-0 mb-7 text-center text-plum-700 animate-[bs-pop_0.7s_ease-out_0.25s_both]">
         Estás invitado al Baby Shower de nuestra bebé
       </h1>
@@ -63,8 +68,8 @@ export default function DetailsPage() {
             <img src={balloons} alt="" className="w-[46px] h-[46px] object-contain scale-[1.7]" />
           </div>
           <div>
-            <div className="font-bold text-base">Sábado 25 de Julio, 2026</div>
-            <div className="text-ink-mute text-[15px]">5:00 pm</div>
+            <div className="font-bold text-base">{EVENT_DATE_LABEL}</div>
+            <div className="text-ink-mute text-[15px]">{EVENT_TIME_LABEL}</div>
           </div>
         </div>
         <div className="h-px bg-divider" />

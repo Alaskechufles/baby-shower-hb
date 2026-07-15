@@ -7,6 +7,7 @@ import { useGuest } from '../context/GuestContext';
 import { useGifts } from '../hooks/useGifts';
 import TabNav from '../components/TabNav';
 import GiftCard from '../components/GiftCard';
+import SwitchGuestButton from '../components/SwitchGuestButton';
 
 export default function GiftsPage() {
   const { guestName } = useGuest();
@@ -43,6 +44,9 @@ export default function GiftsPage() {
       <img src={cake} alt="" className="h-[110px] mt-[70px] mb-1.5 animate-[bs-wiggle_3.5s_ease-in-out_infinite]" />
       <div className="font-display italic text-[17px] text-plum-600 mb-1.5 animate-[bs-pop_0.7s_ease-out_0.1s_both]">
         ¡Hola, {guestName}!
+      </div>
+      <div className="mb-4">
+        <SwitchGuestButton />
       </div>
       <h1 className="font-display font-bold text-[clamp(30px,6vw,44px)] m-0 mb-5 text-center text-plum-700 animate-[bs-pop_0.7s_ease-out_0.25s_both]">
         Lista de Regalos

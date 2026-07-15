@@ -168,8 +168,30 @@ grant execute on function set_rsvp(text, boolean) to anon, authenticated;
 grant execute on function get_my_rsvp(text) to anon, authenticated;
 
 -- "Enterizos con pies" and "Enterizos sin pies" were merged into a single
--- "Enterizos de bebé" entry below; drop the old split rows if present.
-delete from gifts where name in ('Enterizos con pies', 'Enterizos sin pies');
+-- "Enterizos de bebé" entry below. Rename one of the old rows in place (so
+-- any existing claims on it carry over) and, if both existed, move the
+-- other's claims over before dropping it -- rather than deleting both rows
+-- outright, which would cascade-delete a guest's existing claim on either.
+do $$
+declare
+  v_keep_id uuid;
+  v_other_id uuid;
+begin
+  select id into v_keep_id from gifts where name = 'Enterizos con pies';
+  if v_keep_id is not null then
+    update gifts set name = 'Enterizos de bebé' where id = v_keep_id;
+  end if;
+
+  select id into v_other_id from gifts where name = 'Enterizos sin pies';
+  if v_other_id is not null then
+    if v_keep_id is not null then
+      update gift_claims set gift_id = v_keep_id where gift_id = v_other_id;
+      delete from gifts where id = v_other_id;
+    else
+      update gifts set name = 'Enterizos de bebé' where id = v_other_id;
+    end if;
+  end if;
+end $$;
 
 -- Seed/update the gift list. Upserts by name, so editing a quantity or
 -- description here and re-running this file updates the existing row

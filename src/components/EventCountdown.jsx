@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { EVENT_DATE } from '../lib/eventInfo';
 
-const EVENT_TIMESTAMP = new Date('2026-07-25T17:00:00-05:00').getTime();
+const EVENT_TIMESTAMP = EVENT_DATE.getTime();
 
 function getParts(msRemaining) {
   const totalSeconds = Math.max(0, Math.floor(msRemaining / 1000));

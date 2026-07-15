@@ -15,6 +15,10 @@ export function useGifts(guestName) {
 
   useEffect(() => {
     let cancelled = false;
+    // If a realtime event arrives before the initial fetch resolves, the
+    // fetch's snapshot may already be stale by the time it lands. Track
+    // that so we merge instead of blindly overwriting and losing it.
+    let receivedRealtimeUpdate = false;
 
     async function load() {
       setLoading(true);
@@ -27,7 +31,17 @@ export function useGifts(guestName) {
         setError(giftsRes.error?.message || claimsRes.error?.message);
       } else {
         setGifts(giftsRes.data);
-        setClaims(claimsRes.data);
+        if (receivedRealtimeUpdate) {
+          setClaims((prev) => {
+            const byId = new Map(claimsRes.data.map((c) => [c.id, c]));
+            for (const c of prev) {
+              if (!byId.has(c.id)) byId.set(c.id, c);
+            }
+            return [...byId.values()];
+          });
+        } else {
+          setClaims(claimsRes.data);
+        }
       }
       setLoading(false);
     }
@@ -40,6 +54,7 @@ export function useGifts(guestName) {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'gift_claims' },
         (payload) => {
+          receivedRealtimeUpdate = true;
           setClaims((prev) =>
             prev.some((c) => c.id === payload.new.id) ? prev : [...prev, payload.new],
           );
@@ -49,6 +64,7 @@ export function useGifts(guestName) {
         'postgres_changes',
         { event: 'DELETE', schema: 'public', table: 'gift_claims' },
         (payload) => {
+          receivedRealtimeUpdate = true;
           setClaims((prev) => prev.filter((c) => c.id !== payload.old.id));
         },
       )
@@ -118,12 +134,14 @@ export function useGifts(guestName) {
     .filter((g) => g.myQty > 0)
     .map((g) => ({ id: g.id, name: g.name, myQty: g.myQty, claimId: g.myClaimId }));
 
+  const clearError = useCallback(() => setError(null), []);
+
   return {
     giftsDisplay,
     myGifts,
     loading,
     error,
-    clearError: () => setError(null),
+    clearError,
     claimGift,
     unclaimGift,
   };

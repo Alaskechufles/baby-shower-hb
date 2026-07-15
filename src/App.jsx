@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { GuestProvider } from './context/GuestContext';
 import { TransitionProvider } from './context/TransitionContext';
@@ -11,12 +11,13 @@ import GiftsPage from './pages/GiftsPage';
 
 function App() {
   const [showIntro, setShowIntro] = useState(true);
+  const dismissIntro = useCallback(() => setShowIntro(false), []);
 
   return (
     <GuestProvider>
       <TransitionProvider>
         <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-cream to-lavender-50 font-body text-ink">
-          {showIntro && <IntroSplash onDone={() => setShowIntro(false)} />}
+          {showIntro && <IntroSplash onDone={dismissIntro} />}
           <PageTransitionOverlay />
           <Routes>
             <Route path="/" element={<WelcomePage />} />
